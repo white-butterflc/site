@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二次方程求解</title>
+</head>
+<body>
+    <script>
+        // 调用提示函数三次，分别获取系数a、b和c的值
+        let a = prompt("请输入系数a的值：");
+        let b = prompt("请输入系数b的值：");
+        let c = prompt("请输入系数c的值：");
+        
+        // 使用parseFloat函数将这些值转换为数字
+        a = parseFloat(a);
+        b = parseFloat(b);
+        c = parseFloat(c);
+        
+        // 检查输入是否有效
+        if (isNaN(a) || isNaN(b) || isNaN(c) || a <= 0) {
+            alert("请输入有效的系数值，且a必须大于0！");
+        } else {
+            // 计算判别式delta = b*b - 4*a*c
+            let delta = b * b - 4 * a * c;
+            
+            // 检查delta是否小于0
+            if (delta < 0) {
+                alert("判别式小于0，无实数解！");
+            } else {
+                // 计算x1 = (-b + Math.sqrt(delta)) / (2*a)
+                let x1 = (-b + Math.sqrt(delta)) / (2 * a);
+                // 计算x2 = (-b - Math.sqrt(delta)) / (2*a)
+                let x2 = (-b - Math.sqrt(delta)) / (2 * a);
+                
+                // 使用alert函数告知用户x1和x2的值
+                alert(`方程的解为：x1 = ${x1.toFixed(2)}, x2 = ${x2.toFixed(2)}`);
+                
+                // 使用console.log函数在控制台输出相同的结果
+                console.log(`方程的解为：x1 = ${x1.toFixed(2)}, x2 = ${x2.toFixed(2)}`);
+            }
+        }
+    </script>
+</body>
+</html>
