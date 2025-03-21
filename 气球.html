@@ -1,0 +1,90 @@
+<html>
+<head>
+    <title>气球动画</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="balloonCanvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('balloonCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 初始化气球数组
+        const balloons = [];
+        for (let i = 0; i < 10; i++) {
+            balloons.push(createBalloon());
+        }
+
+        function createBalloon() {
+            return {
+                x: Math.random() * canvas.width,
+                y: canvas.height + 50, // 初始位置在画布下方
+                radius: 30 + Math.random() * 20,
+                speed: 1 + Math.random() * 3,
+                color: `rgb(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)})`,
+                sizeChange: 0.1 + Math.random() * 0.2,
+                colorChangeR: (Math.random() - 0.5) * 2,
+                colorChangeG: (Math.random() - 0.5) * 2,
+                colorChangeB: (Math.random() - 0.5) * 2
+            };
+        }
+
+        function drawBalloon(balloon) {
+            // 绘制气球主体
+            ctx.beginPath();
+            ctx.ellipse(balloon.x, balloon.y, balloon.radius, balloon.radius * 1.2, 0, 0, Math.PI * 2);
+            ctx.fillStyle = balloon.color;
+            ctx.fill();
+            
+            // 绘制气球系绳
+            ctx.beginPath();
+            ctx.moveTo(balloon.x, balloon.y + balloon.radius * 1.2);
+            ctx.lineTo(balloon.x + 10, balloon.y + balloon.radius * 1.2 + 40);
+            ctx.lineTo(balloon.x - 10, balloon.y + balloon.radius * 1.2 + 60);
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            balloons.forEach(balloon => {
+                // 更新位置
+                balloon.y -= balloon.speed;
+                
+                // 重置位置当气球完全离开屏幕
+                if (balloon.y < -balloon.radius * 2) {
+                    Object.assign(balloon, createBalloon());
+                }
+
+                // 更新尺寸变化
+                balloon.radius += balloon.sizeChange;
+                if (balloon.radius < 20 || balloon.radius > 50) {
+                    balloon.sizeChange *= -1;
+                }
+
+                // 更新颜色变化
+                const colors = balloon.color.match(/\d+/g).map(Number);
+                colors[0] = Math.min(255, Math.max(0, colors[0] + balloon.colorChangeR));
+                colors[1] = Math.min(255, Math.max(0, colors[1] + balloon.colorChangeG));
+                colors[2] = Math.min(255, Math.max(0, colors[2] + balloon.colorChangeB));
+                balloon.color = `rgb(${colors.join()})`;
+
+                drawBalloon(balloon);
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
