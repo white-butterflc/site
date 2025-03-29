@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quadratic Equation Solver</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .equation {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        input {
+            width: 50px;
+            text-align: right;
+            margin: 0 5px;
+        }
+        #solution {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 40px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quadratic Equation Solver</h1>
+    <div class="equation">
+        <input type="number" id="a" value="1">x² + 
+        <input type="number" id="b" value="0">x + 
+        <input type="number" id="c" value="0"> = 0
+    </div>
+    <div id="solution">Solution area</div>
+
+    <script>
+        function calculateSolution() {
+            const a = parseFloat(document.getElementById('a').value) || 0;
+            const b = parseFloat(document.getElementById('b').value) || 0;
+            const c = parseFloat(document.getElementById('c').value) || 0;
+            let solution = '';
+
+            if (a === 0) {
+                if (b === 0) {
+                    if (c === 0) {
+                        solution = 'Infinite solutions (identity equation)';
+                    } else {
+                        solution = 'No solution';
+                    }
+                } else {
+                    const x = -c / b;
+                    solution = `x = ${x}`;
+                }
+            } else {
+                const discriminant = b * b - 4 * a * c;
+                if (discriminant > 0) {
+                    const sqrtD = Math.sqrt(discriminant);
+                    const x1 = (-b + sqrtD) / (2 * a);
+                    const x2 = (-b - sqrtD) / (2 * a);
+                    solution = `x₁ = ${x1.toFixed(2)}, x₂ = ${x2.toFixed(2)}`;
+                } else if (discriminant === 0) {
+                    const x = -b / (2 * a);
+                    solution = `x = ${x.toFixed(2)}`;
+                } else {
+                    const realPart = (-b) / (2 * a);
+                    const imaginaryPart = Math.sqrt(-discriminant) / (2 * a);
+                    solution = `x₁ = ${realPart.toFixed(2)} + ${imaginaryPart.toFixed(2)}i, x₂ = ${realPart.toFixed(2)} - ${imaginaryPart.toFixed(2)}i`;
+                }
+            }
+            document.getElementById('solution').textContent = solution;
+        }
+
+        document.getElementById('a').addEventListener('input', calculateSolution);
+        document.getElementById('b').addEventListener('input', calculateSolution);
+        document.getElementById('c').addEventListener('input', calculateSolution);
+
+        // Initial calculation
+        calculateSolution();
+    </script>
+</body>
+</html>
