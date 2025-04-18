@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优化版气球动画</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: skyblue;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        class Balloon {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.radius = 25 + Math.random() * 25; // 25-50px
+                this.speed = 50 + Math.random() * 100; // 50-150px/s
+                this.x = Math.random() * window.innerWidth;
+                this.y = window.innerHeight + this.radius;
+            }
+
+            update(deltaTime) {
+                this.y -= this.speed * (deltaTime / 1000);
+                if (this.y < -this.radius * 2) {
+                    this.reset();
+                }
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+
+        // 初始化
+        const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan', 'magenta'];
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const balloons = [];
+        const maxBalloons = 500; // 控制同时存在的最大气球数量
+        let lastTime = 0;
+
+        // 调整画布大小
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // 初始化气球池
+        for (let i = 0; i < maxBalloons; i++) {
+            balloons.push(new Balloon());
+        }
+
+        // 动画循环
+        function animate(timestamp) {
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            balloons.forEach(balloon => {
+                balloon.update(deltaTime);
+                balloon.draw(ctx);
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+    </script>
+</body>
+</html>
