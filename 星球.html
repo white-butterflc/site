@@ -1,0 +1,273 @@
+<html>
+<html>
+<head>
+    <title>太阳系模型</title>
+    <style>
+        canvas {
+            background: #000;
+            display: block;
+            margin: 0 auto;
+        }
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        /* 表格样式 */
+        #infoTable {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            z-index: 100;
+            padding: 15px;
+            border-radius: 10px;
+            max-height: 80vh;
+            overflow: auto;
+            box-shadow: 0 0 15px rgba(255,255,255,0.2);
+        }
+        table {
+            border-collapse: collapse;
+            width: 600px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #444;
+            text-align: left;
+        }
+        th {
+            background-color: #333;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        th:hover {
+            background-color: #555;
+        }
+        .color-swatch {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 8px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="solarSystem"></canvas>
+    <div id="infoTable">
+        <table>
+            <thead>
+                <tr>
+                    <th data-key="name">名称</th>
+                    <th data-key="mass">质量 (kg)</th>
+                    <th data-key="orbitRadius">轨道半径 (百万km)</th>
+                    <th data-key="color">颜色</th>
+                    <th data-key="diameter">直径 (km)</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('solarSystem');
+        const ctx = canvas.getContext('2d');
+        const infoTable = document.getElementById('infoTable');
+        
+        // 设置画布尺寸
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // 天体数据（简化参数）
+        const bodies = [
+            { // 太阳
+                name: 'Sun',
+                radius: 30,
+                color: '#ffd700',
+                orbitRadius: 0,
+                angle: 0,
+                speed: 0,
+                mass: 1.989e30,
+                diameter: 1392700
+            },
+            { // 水星
+                name: 'Mercury',
+                radius: 8,
+                color: '#A0522D',
+                orbitRadius: 70,
+                angle: 0,
+                speed: 0.03,
+                mass: 3.3011e23,
+                diameter: 4879
+            },
+            { // 金星
+                name: 'Venus',
+                radius: 12,
+                color: '#DEB887',
+                orbitRadius: 100,
+                angle: 0,
+                speed: 0.02,
+                mass: 4.8675e24,
+                diameter: 12104
+            },
+            { // 地球
+                name: 'Earth',
+                radius: 13,
+                color: '#4169E1',
+                orbitRadius: 140,
+                angle: 0,
+                speed: 0.015,
+                mass: 5.97237e24,
+                diameter: 12742
+            },
+            { // 火星
+                name: 'Mars',
+                radius: 10,
+                color: '#CD5C5C',
+                orbitRadius: 180,
+                angle: 0,
+                speed: 0.01,
+                mass: 6.4171e23,
+                diameter: 6779
+            },
+            { // 木星
+                name: 'Jupiter',
+                radius: 28,
+                color: '#DAA520',
+                orbitRadius: 240,
+                angle: 0,
+                speed: 0.007,
+                mass: 1.89819e27,
+                diameter: 139820
+            },
+            { // 土星
+                name: 'Saturn',
+                radius: 24,
+                color: '#F4A460',
+                orbitRadius: 300,
+                angle: 0,
+                speed: 0.005,
+                mass: 5.6834e26,
+                diameter: 116460
+            },
+            { // 天王星
+                name: 'Uranus',
+                radius: 18,
+                color: '#87CEEB',
+                orbitRadius: 340,
+                angle: 0,
+                speed: 0.003,
+                mass: 8.6810e25,
+                diameter: 50724
+            },
+            { // 海王星
+                name: 'Neptune',
+                radius: 17,
+                color: '#4682B4',
+                orbitRadius: 380,
+                angle: 0,
+                speed: 0.002,
+                mass: 1.02413e26,
+                diameter: 49244
+            }
+        ];
+
+        // 表格排序系统
+        let sortKey = 'orbitRadius';
+        let sortAsc = true;
+
+        function updateTable() {
+            const sorted = [...bodies].sort((a, b) => {
+                const valA = a[sortKey];
+                const valB = b[sortKey];
+                return sortAsc ? valA - valB : valB - valA;
+            });
+
+            const tbody = document.querySelector('#infoTable tbody');
+            tbody.innerHTML = sorted.map(body => `
+                <tr>
+                    <td>${body.name}</td>
+                    <td>${body.mass.toExponential(2)}</td>
+                    <td>${(body.orbitRadius * 1e-6).toFixed(3)}</td>
+                    <td><div class="color-swatch" style="background:${body.color}"></div>${body.color}</td>
+                    <td>${body.diameter}</td>
+                </tr>
+            `).join('');
+
+            // 更新表头指示
+            document.querySelectorAll('th').forEach(th => {
+                th.innerHTML = th.dataset.key;
+                if (th.dataset.key === sortKey) {
+                    th.innerHTML += sortAsc ? ' ▲' : ' ▼';
+                }
+            });
+        }
+
+        // 事件监听
+        document.addEventListener('click', (e) => {
+            if (!infoTable.contains(e.target)) {
+                infoTable.style.display = infoTable.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+
+        document.querySelectorAll('th').forEach(th => {
+            th.addEventListener('click', () => {
+                const key = th.dataset.key;
+                if (sortKey === key) {
+                    sortAsc = !sortAsc;
+                } else {
+                    sortKey = key;
+                    sortAsc = true;
+                }
+                updateTable();
+            });
+        });
+
+        // 动画循环
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制中心点（太阳位置）
+            const centerX = canvas.width/2;
+            const centerY = canvas.height/2;
+            
+            // 绘制所有天体
+            bodies.forEach(body => {
+                // 计算行星位置
+                const x = centerX + body.orbitRadius * Math.cos(body.angle);
+                const y = centerY + body.orbitRadius * Math.sin(body.angle);
+                
+                // 绘制轨道
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.arc(centerX, centerY, body.orbitRadius, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // 绘制天体
+                ctx.beginPath();
+                ctx.fillStyle = body.color;
+                ctx.arc(x, y, body.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 更新角度
+                body.angle += body.speed;
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // 初始化
+        updateTable();
+        animate();
+
+        // 窗口大小变化时重置画布
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
